@@ -66,18 +66,11 @@
     box-shadow:0 8px 32px var(--shadow); padding:1.6rem;
   }
   .panel-header{margin-bottom:1rem;border-bottom:2px solid var(--accent-primary);padding-bottom:.7rem;display:flex;justify-content:space-between;align-items:center}
-  /* ▼ 변경: PC에서도 수직 배치 + 간격 확대 */
-  #editor-sheet{
-    display:flex;
-    flex-direction:column;
-    gap:2rem;
-    align-items:stretch;
-  }
-  /* ▼ 변경: 수직 배치에 맞춰 폭 제약 해제 */
-  .settings-panel,.results-panel{width:100%;min-width:unset;max-width:none}
-  .settings-panel{flex:1;/* 기존 min/max 해제됨 */}
-  .results-panel{flex:2;/* 기존 min/max 해제됨 */}
-  .divider{height:1px;background:var(--panel-border);margin:1.2rem 0;border:none}
+  .panel-header h2{font-size:1.18rem;font-weight:800;color:var(--text-primary)}
+  #editor-sheet{display:flex;gap:1.6rem;align-items:flex-start}
+  .settings-panel{flex:1;min-width:320px;max-width:480px}
+  .results-panel{flex:2;min-width:420px}
+  .divider{height:1px;background:var(--panel-border);margin:.9rem 0;border:none}
 
   .input-group{display:flex;flex-direction:column}
   .input-group label{font-size:.93rem;font-weight:700;color:var(--text-primary);margin-bottom:.45rem}
@@ -88,8 +81,6 @@
   .input-wrapper input,.input-wrapper select{
     width:100%; background:transparent; border:none; padding:.8rem 1rem; font-size:1rem; color:var(--text-primary); font-family:var(--font-secondary)
   }
-  /* ▼ 변경: 옵션 사이 간격 확대 */
-  .settings-panel .input-group{margin-bottom:1.4rem !important}
 
   .btn{
     display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
@@ -102,14 +93,13 @@
   .btn.primary{background:var(--accent-secondary); color:#fff; border:none}
   .btn.primary:hover{background:var(--accent-secondary-dark)}
   .btn-chip{padding:.42rem .65rem; font-size:.92rem}
-  .btn.active{background:var(--accent-primary); color:#fff; border-color:var(--accent-primary)}
+  .btn.active{background:var(--accent-primary); color:#fff; border-color:#2a7bd5}
 
   .upload-block{padding:12px;border:1px dashed var(--panel-border);border-radius:12px;background:var(--input-bg)}
-  /* ▼ 변경: 썸네일 영역 스크롤 제거 */
-  .thumb-area{overflow:visible;width:100%}
+  .thumb-area{width:100%} /* 스크롤바 제거: overflow 제거 */
   .thumb-grid{
     display:grid;
-    grid-template-columns: repeat(6, var(--thumb-size)); /* PC 6개 고정 */
+    grid-template-columns: repeat(6, var(--thumb-size));
     gap: var(--thumb-gap);
     width: calc(6 * var(--thumb-size) + 5 * var(--thumb-gap));
     margin: 10px auto 0;
@@ -133,26 +123,37 @@
   .box h4{margin:0 0 8px}
   canvas{max-width:100%;border:1px dashed var(--panel-border);border-radius:10px;background:transparent}
 
-  /* 로딩 오버레이 (4.8.3에서 발췌, GIF만 크게) */
+  /* 로딩 오버레이 (요청 반영: GIF 크게, 문구는 GIF 아래) */
   #loadingOverlay{
     position:fixed; inset:0; display:none;
     align-items:center; justify-content:center;
     background:rgba(0,0,0,.35); z-index:9999; backdrop-filter:blur(1.5px);
+    /* 추가 */
+    flex-direction:column; text-align:center; padding:16px;
   }
   #loadingOverlay.show{display:flex}
-  #loadingGif{width:160px;height:160px;image-rendering:auto}
-  #loadingText{font-weight:800;margin-left:12px}
+  #loadingGif{
+    width:400px;              /* 400×268 기준 */
+    height:auto;
+    aspect-ratio:400/268;     /* 비틀림 방지 */
+    max-width:min(90vw,420px);
+    object-fit:contain;
+    image-rendering:auto;
+    margin-bottom:12px;       /* 아래 문구와 간격 */
+  }
+  #loadingText{
+    font-weight:800;
+    margin:0;                 /* 좌우 여백 제거, 위 간격은 GIF에서 처리 */
+  }
 
   @media (max-width:640px){
     body{padding:1rem}
-    /* 모바일도 수직 유지 (기본과 동일) */
-    #editor-sheet{flex-direction:column;gap:1.3rem}
+    #editor-sheet{flex-direction:column;gap:1.6rem} /* 모바일 수직 + 간격 약간 증가 */
     .settings-panel,.results-panel{width:100%;min-width:unset;max-width:none}
     .app-header{padding:1rem; padding-top:4rem; border-radius:0 0 16px 16px}
     .version-info{right:1rem; font-size:.7rem; display:flex; flex-direction:column; align-items:flex-end}
     .theme-toggle{left:1rem}
     .app-header h1{font-size:1.5rem}
-    /* 모바일 2개 고정 */
     .thumb-grid{
       grid-template-columns: repeat(2, var(--thumb-size-mobile));
       width: calc(2 * var(--thumb-size-mobile) + 1 * var(--thumb-gap));
@@ -193,37 +194,37 @@
           <div class="panel-header"><h2>업로드 및 옵션</h2></div>
 
           <div class="upload-block">
-            <div class="input-group" style="margin-bottom:.4rem">
+            <div class="input-group" style="margin-bottom:1.0rem">
               <label for="fileInput">이미지 업로드</label>
               <div class="input-wrapper">
                 <input id="fileInput" type="file" multiple accept="image/*" />
               </div>
-              <div class="small" style="margin-top:.45rem">드래그로 순서 변경 · ↻ 회전 · ❌ 삭제 · 이름정렬</div>
-              <div style="display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap">
+              <div class="small" style="margin-top:.7rem">드래그로 순서 변경 · ↻ 회전 · ❌ 삭제 · 이름정렬</div>
+              <div style="display:flex;gap:.6rem;margin-top:.8rem;flex-wrap:wrap">
                 <button id="sortAsc" class="btn btn-chip">이름순</button>
                 <button id="sortDesc" class="btn btn-chip">이름 역순</button>
                 <button id="clearAll" class="btn btn-chip">모두 지우기</button>
               </div>
             </div>
 
-            <div class="thumb-area">
+            <div class="thumb-area" style="margin-top:1rem">
               <div id="thumbContainer" class="thumb-grid"></div>
             </div>
           </div>
 
           <hr class="divider" />
 
-          <div class="input-group">
+          <div class="input-group" style="margin-bottom:1.0rem">
             <label>합치기 방향</label>
-            <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.3rem">
               <button class="btn btn-chip orientBtn active" data-orient="vertical">세로로 합치기</button>
               <button class="btn btn-chip orientBtn" data-orient="horizontal">가로로 합치기</button>
             </div>
           </div>
 
-          <div class="input-group">
+          <div class="input-group" style="margin-bottom:1.0rem">
             <label>가로 크기</label>
-            <div style="display:flex;flex-wrap:wrap;gap:.5rem">
+            <div style="display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.3rem">
               <button class="btn btn-chip widthBtn active" data-width="auto">자동 (가장 큰 사진에 맞춤)</button>
               <button class="btn btn-chip widthBtn" data-width="720">720</button>
               <button class="btn btn-chip widthBtn" data-width="1280">1280 (추천)</button>
@@ -231,23 +232,23 @@
               <button class="btn btn-chip widthBtn" data-width="2560">2560</button>
               <button class="btn btn-chip widthBtn" data-width="3840">3840</button>
             </div>
-            <div class="input-wrapper" style="margin-top:.5rem">
+            <div class="input-wrapper" style="margin-top:.7rem">
               <input id="customWidth" type="number" placeholder="직접 입력(px)" />
             </div>
-            <div class="small" id="sizeHint">세로 합치기: 폭 기준 · 가로 합치기: 높이 기준</div>
+            <div class="small" id="sizeHint" style="margin-top:.4rem">세로 합치기: 폭 기준 · 가로 합치기: 높이 기준</div>
           </div>
 
-          <div class="input-group">
+          <div class="input-group" style="margin-bottom:1.0rem">
             <label>배치 방식</label>
-            <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.3rem">
               <button class="btn btn-chip layoutBtn active" data-layout="scale">비율 유지 (기준 크기에 맞춰 자동 스케일)</button>
               <button class="btn btn-chip layoutBtn" data-layout="pad">패딩 맞춤 (원본 크기 보존, 여백 채우기)</button>
             </div>
           </div>
 
-          <div id="padOptions" class="input-group hidden">
+          <div id="padOptions" class="input-group hidden" style="margin-bottom:1.0rem">
             <label>정렬 · 배경</label>
-            <div style="display:flex; gap:.5rem; flex-wrap:wrap">
+            <div style="display:flex; gap:.6rem; flex-wrap:wrap; margin-top:.3rem">
               <div class="input-wrapper" style="min-width:140px">
                 <select id="padAlign">
                   <option value="start">좌/상</option>
@@ -265,37 +266,37 @@
             </div>
           </div>
 
-          <div class="input-group">
+          <div class="input-group" style="margin-bottom:1.0rem">
             <label for="gapInput">이미지 간격</label>
-            <div class="input-wrapper">
+            <div class="input-wrapper" style="margin-top:.3rem">
               <input id="gapInput" type="number" value="0"/><span style="padding:0 12px;color:var(--text-secondary)">px</span>
             </div>
           </div>
 
           <div class="input-group">
             <label>출력 형식</label>
-            <div style="display:flex; gap:.5rem; flex-wrap:wrap">
+            <div style="display:flex; gap:.6rem; flex-wrap:wrap; margin-top:.3rem">
               <button class="btn btn-chip fmtBtn active" data-format="image/jpeg">JPEG</button>
               <button class="btn btn-chip fmtBtn" data-format="image/png">PNG</button>
             </div>
           </div>
-          <div id="jpegQualityRow" class="input-group">
+          <div id="jpegQualityRow" class="input-group" style="margin-top:.7rem">
             <label for="qualityInput">JPEG 품질</label>
-            <div class="input-wrapper">
+            <div class="input-wrapper" style="margin-top:.3rem">
               <input id="qualityInput" type="number" min="50" max="100" step="1" value="100"/><span style="padding:0 12px;color:var(--text-secondary)">%</span>
             </div>
           </div>
 
           <hr class="divider" />
 
-          <div style="display:flex; gap:.6rem; flex-wrap:wrap">
+          <div style="display:flex; gap:.7rem; flex-wrap:wrap">
             <button id="mergeBtn" class="btn primary">이미지 합치기</button>
             <button id="downloadBtn" class="btn" disabled>다운로드</button>
           </div>
-          <div id="statusLine" class="small" style="margin-top:.6rem"></div>
+          <div id="statusLine" class="small" style="margin-top:.8rem"></div>
         </section>
 
-        <!-- 우측 (이제 아래로 배치됨) -->
+        <!-- 우측 -->
         <section class="panel results-panel">
           <div class="panel-header">
             <h2>미리보기</h2>
@@ -303,16 +304,16 @@
           </div>
 
           <!-- 미리보기 위 예상 용량 -->
-          <div id="estLine" class="small" style="margin:-.35rem 0 .6rem 0"></div>
+          <div id="estLine" class="small" style="margin:-.35rem 0 .8rem 0"></div>
 
           <!-- 1) 축소 미리보기 먼저 -->
-          <div class="box">
+          <div class="box" style="margin-bottom:1rem">
             <h4>축소 미리보기</h4>
             <canvas id="previewSmall"></canvas>
           </div>
 
           <!-- 2) 큰 미리보기 다음 -->
-          <div class="box" style="margin-top:1rem">
+          <div class="box">
             <h4>큰 미리보기 (세로 최대 10,000px)</h4>
             <canvas id="previewLarge"></canvas>
           </div>
@@ -413,7 +414,12 @@
       ? '세로 합치기: 폭을 기준으로 스케일합니다'
       : '가로 합치기: 높이를 기준으로 스케일합니다';
   }
-  function drawEmptyPreviews(){ previewLarge.width=1; previewLarge.height=1; previewSmall.width=1; previewSmall.height=1; estLine.textContent=''; infoLine.textContent=''; downloadBtn.disabled=true; }
+  function drawEmptyPreviews(){
+    previewLarge.width=1; previewLarge.height=1;
+    previewSmall.width=1; previewSmall.height=1;
+    estLine.textContent=''; infoLine.textContent='';
+    downloadBtn.disabled=true;
+  }
 
   fileInput.addEventListener('change',()=>{
     const files=Array.from(fileInput.files||[]);
