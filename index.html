@@ -66,16 +66,11 @@
     box-shadow:0 8px 32px var(--shadow); padding:1.6rem;
   }
   .panel-header{margin-bottom:1rem;border-bottom:2px solid var(--accent-primary);padding-bottom:.7rem;display:flex;justify-content:space-between;align-items:center}
-  #editor-sheet{
-    display:flex;
-    flex-direction:column;
-    gap:2rem;
-    align-items:stretch;
-  }
-  .settings-panel,.results-panel{width:100%;min-width:unset;max-width:none}
-  .settings-panel{flex:1;}
-  .results-panel{flex:2;}
-  .divider{height:1px;background:var(--panel-border);margin:1.2rem 0;border:none}
+  .panel-header h2{font-size:1.18rem;font-weight:800;color:var(--text-primary)}
+  #editor-sheet{display:flex;gap:1.6rem;align-items:flex-start}
+  .settings-panel{flex:1;min-width:320px;max-width:480px}
+  .results-panel{flex:2;min-width:420px}
+  .divider{height:1px;background:var(--panel-border);margin:.9rem 0;border:none}
 
   .input-group{display:flex;flex-direction:column}
   .input-group label{font-size:.93rem;font-weight:700;color:var(--text-primary);margin-bottom:.45rem}
@@ -86,7 +81,6 @@
   .input-wrapper input,.input-wrapper select{
     width:100%; background:transparent; border:none; padding:.8rem 1rem; font-size:1rem; color:var(--text-primary); font-family:var(--font-secondary)
   }
-  .settings-panel .input-group{margin-bottom:1.4rem !important}
 
   .btn{
     display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
@@ -129,18 +123,30 @@
   .box h4{margin:0 0 8px}
   canvas{max-width:100%;border:1px dashed var(--panel-border);border-radius:10px;background:transparent}
 
-  /* 로딩 오버레이 (GIF 크게, 문구는 아래) */
+  /* 로딩 오버레이 */
   #loadingOverlay{
     position:fixed; inset:0; display:none;
-    align-items:center; justify-content:center;
+    align-items:center; justify-content:center; flex-direction:column;
     background:rgba(0,0,0,.35); z-index:9999; backdrop-filter:blur(1.5px);
-    display:none; /* 유지 */
-    flex-direction:column; /* 문구를 아래로 */
-    text-align:center;
+    text-align:center; padding:16px;
   }
   #loadingOverlay.show{display:flex}
-  #loadingGif{width:400px;height:268px;image-rendering:auto}
-  #loadingText{font-weight:800;margin-top:12px} /* 옆이 아니라 아래로 */
+  /* GIF 크기 고정 (400x268) 및 비율 유지 */
+  #loadingGif{
+    width:400px; height:268px;
+    object-fit:contain; image-rendering:auto; margin-bottom:12px;
+  }
+  /* 박스형 텍스트 + 소폭 폰트 증가 */
+  #loadingText{
+    font-weight:800;
+    font-size:22px; /* 소폭 증가 */
+    color:#fff;
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:12px;
+    padding:10px 16px;
+    text-shadow:0 1px 2px rgba(0,0,0,.6);
+  }
 
   @media (max-width:640px){
     body{padding:1rem}
@@ -168,8 +174,8 @@
   <div class="container">
     <header class="app-header">
       <div class="version-info">
-        <div>Version: 1.2.1</div>
-        <div>Last Updated: 2025.11.01</div>
+        <div>Version: 1.0.0</div>
+        <div>Last Updated: 2025.11.02</div>
       </div>
       <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
         <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
@@ -210,7 +216,7 @@
 
           <hr class="divider" />
 
-          <div class="input-group">
+          <div class="input-group" style="margin-bottom:.8rem">
             <label>합치기 방향</label>
             <div style="display:flex;gap:.5rem;flex-wrap:wrap">
               <button class="btn btn-chip orientBtn active" data-orient="vertical">세로로 합치기</button>
@@ -218,7 +224,7 @@
             </div>
           </div>
 
-          <div class="input-group">
+          <div class="input-group" style="margin-bottom:.8rem">
             <label>가로 크기</label>
             <div style="display:flex;flex-wrap:wrap;gap:.5rem">
               <button class="btn btn-chip widthBtn active" data-width="auto">자동 (가장 큰 사진에 맞춤)</button>
@@ -234,7 +240,7 @@
             <div class="small" id="sizeHint">세로 합치기: 폭 기준 · 가로 합치기: 높이 기준</div>
           </div>
 
-          <div class="input-group">
+          <div class="input-group" style="margin-bottom:.8rem">
             <label>배치 방식</label>
             <div style="display:flex;gap:.5rem;flex-wrap:wrap">
               <button class="btn btn-chip layoutBtn active" data-layout="scale">비율 유지 (기준 크기에 맞춰 자동 스케일)</button>
@@ -242,7 +248,7 @@
             </div>
           </div>
 
-          <div id="padOptions" class="input-group hidden">
+          <div id="padOptions" class="input-group hidden" style="margin-bottom:.8rem">
             <label>정렬 · 배경</label>
             <div style="display:flex; gap:.5rem; flex-wrap:wrap">
               <div class="input-wrapper" style="min-width:140px">
@@ -262,7 +268,7 @@
             </div>
           </div>
 
-          <div class="input-group">
+          <div class="input-group" style="margin-bottom:.8rem">
             <label for="gapInput">이미지 간격</label>
             <div class="input-wrapper">
               <input id="gapInput" type="number" value="0"/><span style="padding:0 12px;color:var(--text-secondary)">px</span>
@@ -276,7 +282,7 @@
               <button class="btn btn-chip fmtBtn" data-format="image/png">PNG</button>
             </div>
           </div>
-          <div id="jpegQualityRow" class="input-group">
+          <div id="jpegQualityRow" class="input-group" style="margin-top:.6rem">
             <label for="qualityInput">JPEG 품질</label>
             <div class="input-wrapper">
               <input id="qualityInput" type="number" min="50" max="100" step="1" value="100"/><span style="padding:0 12px;color:var(--text-secondary)">%</span>
@@ -292,7 +298,7 @@
           <div id="statusLine" class="small" style="margin-top:.6rem"></div>
         </section>
 
-        <!-- 우측 (이제 아래로 배치됨) -->
+        <!-- 우측 -->
         <section class="panel results-panel">
           <div class="panel-header">
             <h2>미리보기</h2>
@@ -625,7 +631,7 @@
         a.download=`merged_${orient}_${ts}.${format==='image/png'?'png':'jpg'}`;
         a.href=URL.createObjectURL(blob);
         a.click();
-      setTimeout(()=>URL.revokeObjectURL(a.href),1200);
+        setTimeout(()=>URL.revokeObjectURL(a.href),1200);
       };
     }catch(err){
       console.error(err); alert('처리 중 오류가 발생했습니다.');
